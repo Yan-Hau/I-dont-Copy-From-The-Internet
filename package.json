@@ -4,9 +4,9 @@
   "version": "1.0.0",
   "scripts": {
     "build": "docker build -t nachos .",
-    "bash": "docker run -v /home/yanhau/NachOS/code:/app -it --rm nachos",
-    "make": "docker run -v /home/yanhau/NachOS/code:/app -it --rm nachos /bin/bash -c \"cd /app && make\"",
-    "clean-run": "make clean && docker run -v /home/yanhau/NachOS/code:/app -it --rm nachos /bin/bash -c \"cd /app && make\"",
+    "bash": "docker run -v /home/yanhau/NachOS:/app -it --rm nachos",
+    "make": "docker run -v /home/yanhau/NachOS:/app -it --rm nachos /bin/bash -c \"cd /app && make\"",
+    "clean-run": "make clean && docker run -v /home/yanhau/NachOS:/app -it --rm nachos /bin/bash -c \"cd /app && make\"",
     "prune": "docker system prune --all"
   }
 }
