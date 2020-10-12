@@ -35,8 +35,6 @@
 *.out
 *.app
 
-usr
-bin
 npm-*
 makedep
 # End of https://www.toptal.com/developers/gitignore/api/c++
