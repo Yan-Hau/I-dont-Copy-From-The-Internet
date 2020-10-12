@@ -24,6 +24,7 @@ Alarm::Alarm(bool doRandom)
 {
     timer = new Timer(doRandom, this);
 }
+
 void Alarm::CallBack()
 {
     Interrupt *interrupt = kernel->interrupt;
@@ -44,44 +45,43 @@ void Alarm::CallBack()
     }
 }
 
+int i = 1;
 void Alarm::WaitUntil(int x)
 {
-    //close
     IntStatus oldLevel = kernel->interrupt->SetLevel(IntOff);
-    Thread *t = kernel->currentThread;
-    cout << "Alarm::WaitUntil go sleep" << endl;
-    this->slist.push(t, x);
-    
-    //open
+    Thread *thread = kernel->currentThread;
+    cout << "Alarm::WaitUntil, time:" << i << endl;
+    ++i;
+    this->slist.push(thread, x);
     kernel->interrupt->SetLevel(oldLevel);
 }
 
-bool SleepList::isEmpty()
+bool ThreadQueue::isEmpty()
 {
     return this->threadList.empty();
 }
 
-void SleepList::push(Thread *thread, int n)
+void ThreadQueue::push(Thread *thread, int n)
 {
     ASSERT(kernel->interrupt->getLevel() == IntOff);
-    this->threadList.push_back(SleepThread(thread, _current_interrupt + n));
+    this->threadList.push_back(ThreadWrapper(thread, _current_interrupt + n));
     thread->Sleep(false);
 }
 
-bool SleepList::ready()
+bool ThreadQueue::ready()
 {
     bool woken = false;
     ++this->_current_interrupt;
-    std::list<SleepThread>::iterator it = threadList.begin();
+    std::list<ThreadWrapper>::iterator it = threadList.begin();
     for (; it != threadList.end();)
     {
         if (this->_current_interrupt >= it->when) {
             woken = true;
-            cout << "Thread ready" << endl;
             kernel->scheduler->ReadyToRun(it->sleeper);
             it = this->threadList.erase(it);
         } else {
             ++it;
         }
     }
+    return woken;
 }

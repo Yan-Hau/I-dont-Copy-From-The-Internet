@@ -24,24 +24,23 @@
 #include "thread.h"
 #include <list>
 
-class SleepList
+class ThreadQueue
 {
 public:
-    SleepList() : _current_interrupt(0){};
+    ThreadQueue() : _current_interrupt(0){};
     void push(Thread*, int);
     bool ready();
     bool isEmpty();
 
 private:
-    class SleepThread
+    struct ThreadWrapper
     {
-    public:
-        SleepThread(Thread* thread, int n) : sleeper(thread), when(n) { };
-        Thread *sleeper;
+        ThreadWrapper(Thread* thread, int n) : sleeper(thread), when(n) { };
+        Thread* sleeper;
         int when;
     };
     int _current_interrupt;
-    std::list<SleepThread> threadList;
+    std::list<ThreadWrapper> threadList;
 };
 
 // The following class defines a software alarm clock.
@@ -55,7 +54,7 @@ public:
 
 private:
     Timer *timer;
-    SleepList slist;
+    ThreadQueue slist;
     void CallBack();
 };
 

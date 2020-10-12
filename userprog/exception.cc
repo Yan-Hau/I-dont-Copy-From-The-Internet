@@ -87,7 +87,7 @@ void ExceptionHandler(ExceptionType which)
 		
 		case SC_Sleep:
 			val = kernel->machine->ReadRegister(4);
-			cout << "Time:" << val << " ms" << endl;
+			cout << "Sleep Time:" << val << " ms" << endl;
 			kernel->alarm->WaitUntil(val);
 			break;
 		}
@@ -96,5 +96,5 @@ void ExceptionHandler(ExceptionType which)
 		cerr << "Unexpected user mode exception" << which << "\n";
 		break;
 	}
-	ASSERTNOTREACHED();
+	//ASSERTNOTREACHED();
 }

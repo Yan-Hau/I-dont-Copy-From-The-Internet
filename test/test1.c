@@ -2,6 +2,8 @@
 main()
 {
 	int n;
-	for (n = 9; n > 5; n--)
-		PrintInt(n);
+	for (n = 0; n < 5; ++n)
+	{
+		Sleep(1000);
+	}
 }
