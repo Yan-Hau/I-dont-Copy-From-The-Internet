@@ -64,7 +64,10 @@ matmult: matmult.o start.o
 	$(LD) $(LDFLAGS) start.o matmult.o -o matmult.coff
 	../bin/coff2noff matmult.coff matmult
 
+sleep: sleep.o start.o
+	$(LD) $(LDFLAGS) start.o sleep.o -o sleep.coff
+	../bin/coff2noff sleep.coff sleep
+
 test1: test1.o start.o
 	$(LD) $(LDFLAGS) start.o test1.o -o test1.coff
 	../bin/coff2noff test1.coff test1
-

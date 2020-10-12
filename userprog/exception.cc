@@ -84,6 +84,12 @@ void ExceptionHandler(ExceptionType which)
 		default:
 			cerr << "Unexpected system call " << type << "\n";
 			break;
+		
+		case SC_Sleep:
+			val = kernel->machine->ReadRegister(4);
+			cout << "Time:" << val << " ms" << endl;
+			kernel->alarm->WaitUntil(val);
+			break;
 		}
 		break;
 	default:

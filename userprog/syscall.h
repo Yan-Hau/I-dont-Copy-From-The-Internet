@@ -1,23 +1,8 @@
-/* syscalls.h
- * 	Nachos system call interface.  These are Nachos kernel operations
- * 	that can be invoked from user programs, by trapping to the kernel
- *	via the "syscall" instruction.
- *
- *	This file is included by user programs and by the Nachos kernel.
- *
- * Copyright (c) 1992-1993 The Regents of the University of California.
- * All rights reserved.  See copyright.h for copyright notice and limitation
- * of liability and disclaimer of warranty provisions.
- */
-
 #ifndef SYSCALLS_H
 #define SYSCALLS_H
 
 #include "copyright.h"
 
-/* system call codes -- used by the stubs to tell the kernel which system call
- * is being asked for
- */
 #define SC_Halt 0
 #define SC_Exit 1
 #define SC_Exec 2
@@ -30,7 +15,7 @@
 #define SC_ThreadFork 9
 #define SC_ThreadYield 10
 #define SC_PrintInt 11
-
+#define SC_Sleep 12
 #ifndef IN_ASM
 
 /* The system call interface.  These are the operations the Nachos
@@ -113,17 +98,16 @@ void Close(OpenFileId id);
  * Could define other operations, such as LockAcquire, LockRelease, etc.
  */
 
-/* Fork a thread to run a procedure ("func") in the *same* address space
- * as the current thread.
- */
+/* Fork a thread to run a procedure ("func") in the *same* address space */
 void ThreadFork(void (*func)());
 
-/* Yield the CPU to another runnable thread, whether in this address space
- * or not.
- */
+/* Yield the CPU to another runnable thread, whether in this address spaceor not. */
 void ThreadYield();
 
-void PrintInt(int number); //my System Call
+void PrintInt(int number);
+
+void Sleep(int milisec);
+
 #endif                     /* IN_ASM */
 
 #endif /* SYSCALL_H */

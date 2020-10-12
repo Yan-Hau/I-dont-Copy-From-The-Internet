@@ -21,22 +21,42 @@
 #include "utility.h"
 #include "callback.h"
 #include "timer.h"
+#include "thread.h"
+#include <list>
+
+class SleepList
+{
+public:
+    SleepList() : _current_interrupt(0){};
+    void push(Thread*, int);
+    bool ready();
+    bool isEmpty();
+
+private:
+    class SleepThread
+    {
+    public:
+        SleepThread(Thread* thread, int n) : sleeper(thread), when(n) { };
+        Thread *sleeper;
+        int when;
+    };
+    int _current_interrupt;
+    std::list<SleepThread> threadList;
+};
 
 // The following class defines a software alarm clock.
 class Alarm : public CallBackObj
 {
 public:
-    Alarm(bool doRandomYield); // Initialize the timer, and callback
-        // to "toCall" every time slice.
+    Alarm(bool doRandomYield);
     ~Alarm() { delete timer; }
 
-    void WaitUntil(int x); // suspend execution until time > now + x
+    void WaitUntil(int x);
 
 private:
-    Timer *timer; // the hardware timer device
-
-    void CallBack(); // called when the hardware
-        // timer generates an interrupt
+    Timer *timer;
+    SleepList slist;
+    void CallBack();
 };
 
 #endif // ALARM_H
