@@ -1,2 +1,0 @@
-1. 請執行 install.sh
-2. 修改 Dockerfile, 將　$pwd 修改為當前工作目錄
