@@ -282,4 +282,4 @@ DEBUG('*', "It's MY DEBUG FLAG!");
 ![Tick](image/learn/Tick.png)
 
 
-於此, 已經把執行一次userProg的流程看過了, 就可以開始看到哪些地方可以修改, 比方說: 一次要執行多個程式, 是不是要在 **addrspace** 管理記憶體分頁, 要處理 Thread排程, 也許在 **thread** 中可以加入 Queue 來進行處理, 若只使用Queue, 就是 FIFO, 若使用 Priority Queue, 就是具有**優先級**的Thread 處理
+於此, 已經把執行一次userProg的流程看過了, 就可以開始看到哪些地方可以修改, 比方說: 一次要執行多個程式, 是不是要在 **addrspace** 管理記憶體分頁, 要處理 Thread排程, 也許在 **thread** 中可以加入 Queue 來進行處理, 若只使用Queue, 就是 FIFO, 若使用 Priority Queue, 就是具有**優先級**的Thread 處理; 透過 IDE tool + C++ Format + GDB + Nachos Debugger, 可以逐步觀察nachos如何模擬一個作業系統
