@@ -14,19 +14,6 @@
     - [Debug Flag](#debug-flag)
     - [GDB (GNU Debugger)](#gdb-gnu-debugger)
 - [初探作業系統](#初探作業系統)
-    - [進入 Nachos的 main function](#進入-nachos的-main-function)
-    - [此時, 可以 Nachos 在檢測一些執行時的flag , args(如 -x filename, -d flag 等)](#此時-可以-nachos-在檢測一些執行時的flag--args如--x-filename--d-flag-等)
-    - [如一開始說明的,可以看到 kernel initial 所做的事情來知道, 必須先創造 Main Thread](#如一開始說明的可以看到-kernel-initial-所做的事情來知道-必須先創造-main-thread)
-    - [不斷運行, 直到準備進入 userProg 的區塊. 此時可能會發現, 左邊的變數會出現一些指標不好觀察, 可以在下方的"偵錯主控台"直接輸入GDB的指令, 如 p /s userProgName 把 "userProgName" 以字串方式印出來(如下方所示), 這時會看到目前的userProgName是 /test/halt.noff](#不斷運行-直到準備進入-userprog-的區塊-此時可能會發現-左邊的變數會出現一些指標不好觀察-可以在下方的偵錯主控台直接輸入gdb的指令-如-p-s-userprogname-把-userprogname-以字串方式印出來如下方所示-這時會看到目前的userprogname是-testhaltnoff)
-    - [此時, 我們已經準備好OS了, 可以看到Nachos在準備 Address space(定址空間), 也就是某個特定的行程, 在記憶體中可以使用與控制的位址區段, 並且要初始化 Main Memory](#此時-我們已經準備好os了-可以看到nachos在準備-address-space定址空間-也就是某個特定的行程-在記憶體中可以使用與控制的位址區段-並且要初始化-main-memory)
-    - [下一步, 是載入UserProg, 會看到是由 kernel的 File System來處理, 接下來就準備執行](#下一步-是載入userprog-會看到是由-kernel的-file-system來處理-接下來就準備執行)
-    - [執行開始, 會開始讀寫Register上的資訊, 然後等一下就會進到 machine->Run](#執行開始-會開始讀寫register上的資訊-然後等一下就會進到-machine-run)
-    - [此時已經開始進行 System Call 了, instr就是指令解碼器, 這裡的重點其實是 66 Line 的 for(;;), 一個無窮迴圈, 裡面不斷執行OneInstruction() 以及 OneTick()  ！P.S. 請注意右下方的Function Call Stack, 可以知道程式的工作狀態](#此時已經開始進行-system-call-了-instr就是指令解碼器-這裡的重點其實是-66-line-的-for-一個無窮迴圈-裡面不斷執行oneinstruction-以及-onetick-ps-請注意右下方的function-call-stack-可以知道程式的工作狀態)
-    - [OneInstruction 就是不斷擷取指令, 然後讀取下一個PCReg](#oneinstruction-就是不斷擷取指令-然後讀取下一個pcreg)
-    - [OP_CODE 節錄](#op_code-節錄)
-    - [OneTick 類似於 CPU 的時脈, 諸如中斷處理, User Tick, Kernel Tick的計算等 , 並且不斷對Thread排程 ( 重點是currentThread->Yield() )](#onetick-類似於-cpu-的時脈-諸如中斷處理-user-tick-kernel-tick的計算等--並且不斷對thread排程--重點是currentthread-yield-)
-    - [而一般的作業系統, 開機後就會不斷運行, 但是Nachos只是模擬而已, 因此會有一個時間的限制, 倘若沒有UserProg, 或是沒有Halt(), 會在某個時間後停止運作, 並且擲出錯誤](#而一般的作業系統-開機後就會不斷運行-但是nachos只是模擬而已-因此會有一個時間的限制-倘若沒有userprog-或是沒有halt-會在某個時間後停止運作-並且擲出錯誤)
-    - [結合 GDB 與 Nachos 的 DEBUG tools, 可以深度追蹤作業系統的運ㄑ作, Nachos可以觀察每個Tick的運作狀況, GDB可以觀察整體程式碼的運作過程](#結合-gdb-與-nachos-的-debug-tools-可以深度追蹤作業系統的運ㄑ作-nachos可以觀察每個tick的運作狀況-gdb可以觀察整體程式碼的運作過程)
 
 # 前言
 本開發環境基於 NTUST - Nachos4.0 , 並參考 UC Berkeley 的 Nachos 4.1 Core 進行修改, 針對幾點進行改善：
@@ -242,43 +229,43 @@ DEBUG('*', "It's MY DEBUG FLAG!");
 ```
 因為我們知道, 作業系統需要初始化, 因此我們載入 Test Example: `halt.noff`, 來觀察 Kernal 與 User State的切換, 按下 F5 進入Debugger:
 
-### 進入 Nachos的 main function
+進入 Nachos的 main function
 ![001](image/learn/001.png)
 
-### 此時, 可以 Nachos 在檢測一些執行時的flag , args(如 -x filename, -d flag 等)
+此時, 可以 Nachos 在檢測一些執行時的flag , args(如 -x filename, -d flag 等)
 ![002](image/learn/002.png)
 
-### 如一開始說明的,可以看到 kernel initial 所做的事情來知道, 必須先創造 Main Thread
+如一開始說明的,可以看到 kernel initial 所做的事情來知道, 必須先創造 Main Thread
 ![MainThread](image/learn/MainThread.png)
 
-### 不斷運行, 直到準備進入 userProg 的區塊. 此時可能會發現, 左邊的變數會出現一些指標不好觀察, 可以在下方的"偵錯主控台"直接輸入GDB的指令, 如 p /s userProgName 把 "userProgName" 以字串方式印出來(如下方所示), 這時會看到目前的userProgName是 /test/halt.noff
+不斷運行, 直到準備進入 userProg 的區塊. 此時可能會發現, 左邊的變數會出現一些指標不好觀察, 可以在下方的"偵錯主控台"直接輸入GDB的指令, 如 p /s userProgName 把 "userProgName" 以字串方式印出來(如下方所示), 這時會看到目前的userProgName是 /test/halt.noff
 ![003](image/learn/003.png)
 
-### 此時, 我們已經準備好OS了, 可以看到Nachos在準備 Address space(定址空間), 也就是某個特定的行程, 在記憶體中可以使用與控制的位址區段, 並且要初始化 Main Memory
+此時, 我們已經準備好OS了, 可以看到Nachos在準備 Address space(定址空間), 也就是某個特定的行程, 在記憶體中可以使用與控制的位址區段, 並且要初始化 Main Memory
 ![004](image/learn/004.png)
 
-### 下一步, 是載入UserProg, 會看到是由 kernel的 File System來處理, 接下來就準備執行
+下一步, 是載入UserProg, 會看到是由 kernel的 File System來處理, 接下來就準備執行
 ![005](image/learn/005.png)
 
-### 執行開始, 會開始讀寫Register上的資訊, 然後等一下就會進到 machine->Run
+執行開始, 會開始讀寫Register上的資訊, 然後等一下就會進到 machine->Run
 ![006](image/learn/006.png)
 
-### 此時已經開始進行 System Call 了, instr就是指令解碼器, 這裡的重點其實是 66 Line 的 for(;;), 一個無窮迴圈, 裡面不斷執行OneInstruction() 以及 OneTick()  ！P.S. 請注意右下方的Function Call Stack, 可以知道程式的工作狀態
+此時已經開始進行 System Call 了, instr就是指令解碼器, 這裡的重點其實是 66 Line 的 for(;;), 一個無窮迴圈, 裡面不斷執行OneInstruction() 以及 OneTick()  ！P.S. 請注意右下方的Function Call Stack, 可以知道程式的工作狀態
 ![007](image/learn/007.png)
 
-### OneInstruction 就是不斷擷取指令, 然後讀取下一個PCReg
+OneInstruction 就是不斷擷取指令, 然後讀取下一個PCReg
 ![X](image/learn/Decode.png)
 
-### OP_CODE 節錄
+OP_CODE 節錄
 ![X](image/learn/OP_CODE.png)
 
-### OneTick 類似於 CPU 的時脈, 諸如中斷處理, User Tick, Kernel Tick的計算等 , 並且不斷對Thread排程 ( 重點是currentThread->Yield() )
+OneTick 類似於 CPU 的時脈, 諸如中斷處理, User Tick, Kernel Tick的計算等 , 並且不斷對Thread排程 ( 重點是currentThread->Yield() )
 ![008](image/learn/008.png)
 
-### 而一般的作業系統, 開機後就會不斷運行, 但是Nachos只是模擬而已, 因此會有一個時間的限制, 倘若沒有UserProg, 或是沒有Halt(), 會在某個時間後停止運作, 並且擲出錯誤
+而一般的作業系統, 開機後就會不斷運行, 但是Nachos只是模擬而已, 因此會有一個時間的限制, 倘若沒有UserProg, 或是沒有Halt(), 會在某個時間後停止運作, 並且擲出錯誤
 ![009](image/learn/009.png)
 
-### 結合 GDB 與 Nachos 的 DEBUG tools, 可以深度追蹤作業系統的運ㄑ作, Nachos可以觀察每個Tick的運作狀況, GDB可以觀察整體程式碼的運作過程
+結合 GDB 與 Nachos 的 DEBUG tools, 可以深度追蹤作業系統的運ㄑ作, Nachos可以觀察每個Tick的運作狀況, GDB可以觀察整體程式碼的運作過程
 ![Tick](image/learn/Tick.png)
 
 
